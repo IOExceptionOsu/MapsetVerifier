@@ -19,6 +19,7 @@ namespace MapsetVerifier
         private ulong setId;
         private Dictionary<string, List<Issue>> lastRunIssues = null;
         private string currentlySelectedTab = null;
+        private Dictionary<string, string> rtfCache = new Dictionary<string, string>();
 
         private TableLayoutPanel panel;
         private ListBox diffList;
@@ -78,6 +79,7 @@ namespace MapsetVerifier
 
         private void openMapsetInExplorer(object sender, System.EventArgs e)
         {
+            Trace.WriteLine($"opening {setPath} in explorer...");
             Process.Start("explorer.exe", setPath);
         }
 
@@ -102,8 +104,30 @@ namespace MapsetVerifier
         {
             List<Issue> issues;
             var found = lastRunIssues.TryGetValue(tab, out issues);
-            if (found)
-                tb.Rtf = constructRtf(issues);
+            if (!found) return;
+
+            string rtf;
+            found = rtfCache.TryGetValue(tab, out rtf);
+            if (!found)
+            {
+                tb.Text = "loading...";
+                ThreadPool.QueueUserWorkItem(_ =>
+                {
+                    rtf = constructRtf(issues);
+                    rtfCache.Add(tab, rtf);
+                    Invoke(new FinishConstructingRTF(finishConstructingRtf), rtf);
+                });
+            }
+            else
+            {
+                tb.Rtf = rtf;
+            }
+        }
+
+        private delegate void FinishConstructingRTF(string rtf);
+        private void finishConstructingRtf(string rtf)
+        {
+            tb.Rtf = rtf;
         }
 
         private void handleOpenLink(object sender, LinkClickedEventArgs e)
@@ -114,7 +138,6 @@ namespace MapsetVerifier
             Process.Start(psi);
         }
 
-        private delegate void FinishRunningChecksDelegate(List<Issue> issues);
 
         private void runChecks()
         {
@@ -126,6 +149,7 @@ namespace MapsetVerifier
             });
         }
 
+        private delegate void FinishRunningChecksDelegate(List<Issue> issues);
         private void finishRunningChecks(List<Issue> issues)
         {
             tb.Clear();

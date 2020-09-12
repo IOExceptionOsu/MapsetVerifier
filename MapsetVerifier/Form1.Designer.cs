@@ -1,4 +1,6 @@
-﻿namespace MapsetVerifier
+﻿using System.Windows.Forms;
+
+namespace MapsetVerifier
 {
     partial class Form1
     {
@@ -39,6 +41,7 @@
             this.openMapsetBtn.Name = "openMapsetBtn";
             this.openMapsetBtn.Size = new System.Drawing.Size(90, 20);
             this.openMapsetBtn.Text = "Open Mapset";
+            this.openMapsetBtn.ShortcutKeys = Keys.Control | Keys.O;
             // 
             // menuStrip1
             // 

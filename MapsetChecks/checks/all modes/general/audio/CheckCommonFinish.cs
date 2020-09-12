@@ -21,7 +21,7 @@ namespace MapsetChecks.checks.general.audio
                 // This check would take on another meaning if applied to taiko, since there you basically map with hit sounds.
                 Beatmap.Mode.Standard,
                 Beatmap.Mode.Catch,
-                Beatmap.Mode.Mania
+                Beatmap.Mode.Mania,
             },
             Category = "Audio",
             Message = "Frequent finish hit sounds.",
